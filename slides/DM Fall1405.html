@@ -1,0 +1,2002 @@
+<!doctype html>
+<html lang="fa" dir="rtl" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>جلسه صفر - مقدمه‌ای بر درس داده‌کاوی</title>
+    <!-- بالاترین سطح بهینه‌سازی فونت -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="preload"
+      href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css"
+      as="style"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css"
+    />
+
+    <style>
+      /* CSS Variables - Cybernetic & Holographic Data UI */
+      :root {
+        --bg-base: #020305;
+        --bg-surface: rgba(10, 12, 18, 0.55);
+        --bg-surface-solid: #080a0f;
+        --bg-card: rgba(13, 17, 26, 0.65);
+        --border-color: rgba(0, 240, 255, 0.15);
+        --border-highlight: rgba(0, 240, 255, 0.4);
+        --text-main: #f0f4f8;
+        --text-muted: #8ba1b5;
+
+        /* Core Data Mining Accents - Brighter for visibility */
+        --accent-cyan: #00ffff;
+        --accent-cyan-glow: rgba(0, 255, 255, 0.6);
+        --accent-purple: #df73ff;
+        --accent-purple-glow: rgba(223, 115, 255, 0.6);
+
+        --info-bg: rgba(0, 240, 255, 0.08);
+        --info-border: #00f0ff;
+        --warning-bg: rgba(255, 171, 0, 0.08);
+        --warning-border: #ffab00;
+        --danger-bg: rgba(255, 49, 49, 0.08);
+        --danger-border: #ff3131;
+
+        --glass-blur: blur(16px);
+        --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.6);
+        --shadow-neon: 0 0 18px var(--accent-cyan-glow);
+      }
+
+      [data-theme="light"] {
+        --bg-base: #f0f4f8;
+        --bg-surface: rgba(255, 255, 255, 0.75);
+        --bg-surface-solid: #ffffff;
+        --bg-card: rgba(255, 255, 255, 0.85);
+        --border-color: rgba(2, 132, 199, 0.2);
+        --border-highlight: rgba(2, 132, 199, 0.5);
+        --text-main: #0f172a;
+        --text-muted: #475569;
+        --accent-cyan: #0284c7;
+        --accent-cyan-glow: rgba(2, 132, 199, 0.4);
+        --accent-purple: #7c3aed;
+        --accent-purple-glow: rgba(124, 58, 237, 0.4);
+        --shadow-card: 0 15px 35px rgba(0, 0, 0, 0.08);
+        --shadow-neon: 0 0 15px rgba(2, 132, 199, 0.3);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Vazirmatn", Tahoma, sans-serif;
+        background-color: var(--bg-base);
+        color: var(--text-main);
+        line-height: 1.6;
+        font-size: 16px;
+        transition:
+          background-color 0.4s ease,
+          color 0.4s ease;
+        -webkit-font-smoothing: antialiased;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* -----------------------------------------------------
+           1. GRAPH BACKGROUND & HUD VIGNETTE (Zero Lag Design)
+           ----------------------------------------------------- */
+      .three-viewport,
+      .fallback-viewport {
+        position: fixed;
+        z-index: 0;
+        inset: 0;
+        pointer-events: none;
+      }
+      /* Increased opacity for brighter graph */
+      #three-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        opacity: 1;
+        filter: contrast(1.2) brightness(1.2);
+      }
+      .fallback-viewport {
+        transition: opacity 0.8s ease;
+      }
+      .three-viewport.three-ready + .fallback-viewport {
+        opacity: 0;
+      }
+      #fallback-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        opacity: 1;
+      }
+
+      /* Adjusted Vignette to let the graph shine brighter on the left */
+      .vignette {
+        position: fixed;
+        z-index: 1;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(
+          ellipse at center,
+          transparent 0%,
+          rgba(2, 3, 5, 0.2) 60%,
+          rgba(2, 3, 5, 0.55) 100%
+        );
+      }
+
+      /* Subtle Tech Grid overlay */
+      .tech-grid {
+        position: fixed;
+        z-index: 1;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.15;
+        background-image:
+          linear-gradient(var(--accent-cyan) 1px, transparent 1px),
+          linear-gradient(90deg, var(--accent-cyan) 1px, transparent 1px);
+        background-size: 60px 60px;
+        mask-image: radial-gradient(
+          ellipse at 25% 50%,
+          black 0%,
+          transparent 60%
+        );
+        -webkit-mask-image: radial-gradient(
+          ellipse at 25% 50%,
+          black 0%,
+          transparent 60%
+        );
+      }
+
+      .ambient-glow {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(130px);
+        z-index: 0;
+        opacity: 0.35;
+        pointer-events: none; /* Increased opacity */
+        will-change: opacity;
+      }
+      .glow-1 {
+        width: 45vw;
+        height: 45vw;
+        background: var(--accent-cyan);
+        top: -10vh;
+        right: -10vw;
+      }
+      .glow-2 {
+        width: 55vw;
+        height: 55vw;
+        background: var(--accent-purple);
+        bottom: -15vh;
+        left: -15vw;
+      }
+
+      /* -----------------------------------------------------
+           2. SPLIT-SCREEN LAYOUT & NAVIGATION
+           ----------------------------------------------------- */
+      .page-wrapper {
+        width: 94%;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 4rem 0 6rem 0;
+        position: relative;
+        z-index: 10;
+      }
+
+      #progress-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.03);
+        z-index: 9999;
+      }
+      #progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(
+          90deg,
+          var(--accent-purple),
+          var(--accent-cyan)
+        );
+        box-shadow: 0 0 15px var(--accent-cyan);
+        transition: width 0.1s linear;
+      }
+
+      .theme-toggle-wrapper {
+        position: fixed;
+        top: 25px;
+        right: 25px;
+        z-index: 1000;
+      }
+      .theme-toggle-btn {
+        background: var(--bg-surface-solid);
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        box-shadow: var(--shadow-card);
+        transition:
+          transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+          border-color 0.2s;
+      }
+      .theme-toggle-btn:hover {
+        transform: scale(1.1);
+        border-color: var(--accent-cyan);
+        box-shadow: var(--shadow-neon);
+      }
+
+      .quick-nav {
+        position: fixed;
+        left: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        z-index: 1000;
+        background: var(--bg-surface);
+        backdrop-filter: var(--glass-blur);
+        padding: 24px 14px;
+        border-radius: 30px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-card);
+      }
+      .nav-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--border-highlight);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+      }
+      .nav-dot::before {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 28px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--bg-surface-solid);
+        color: var(--text-main);
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.2s,
+          transform 0.2s;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-card);
+        transform: translateY(-50%) translateX(-10px);
+      }
+      .nav-dot:hover::before {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+      }
+      .nav-dot:hover,
+      .nav-dot.active {
+        background: var(--accent-cyan);
+        box-shadow: var(--shadow-neon);
+        transform: scale(1.6);
+      }
+
+      #back-to-top {
+        position: fixed;
+        bottom: -60px;
+        right: 25px;
+        z-index: 999;
+        background: var(--bg-surface-solid);
+        border: 1px solid var(--border-color);
+        color: var(--accent-cyan);
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: var(--shadow-card);
+        opacity: 0;
+        pointer-events: none;
+      }
+      #back-to-top.visible {
+        bottom: 25px;
+        opacity: 1;
+        pointer-events: auto;
+      }
+      #back-to-top:hover {
+        background: var(--accent-cyan);
+        color: var(--bg-base);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-neon);
+      }
+
+      /* -----------------------------------------------------
+           3. DATA CARDS & TYPOGRAPHY (HUD Style)
+           ----------------------------------------------------- */
+      header {
+        background: var(--bg-card);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--border-color);
+        padding: 4.5rem 3rem;
+        border-radius: 20px;
+        margin-bottom: 3.5rem;
+        margin-top: 1rem;
+        text-align: center;
+        box-shadow: var(--shadow-card);
+        position: relative;
+        border-top: 4px solid var(--accent-cyan);
+      }
+      header h1 {
+        font-size: 3.2rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+        background: linear-gradient(
+          to left,
+          var(--accent-cyan),
+          var(--accent-purple)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -1px;
+      }
+      header .subtitle {
+        font-size: 1.4rem;
+        color: var(--text-muted);
+        margin-bottom: 2.5rem;
+        font-weight: 600;
+      }
+      .meta-info {
+        background: rgba(0, 0, 0, 0.4);
+        display: inline-block;
+        padding: 1.2rem 2.5rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        border: 1px solid var(--border-highlight);
+        box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.05);
+      }
+
+      .slide {
+        background: var(--bg-card);
+        backdrop-filter: var(--glass-blur);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 3rem;
+        box-shadow: var(--shadow-card);
+        position: relative;
+        opacity: 0;
+        transform: translateY(40px);
+        transition:
+          opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+          transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 0.3s;
+        overflow: hidden;
+        word-wrap: break-word;
+        border-right: 3px solid transparent;
+      }
+      .slide.reveal {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .slide:hover {
+        border-color: var(--border-highlight);
+        border-right: 3px solid var(--accent-purple);
+      }
+
+      .slide h2 {
+        color: var(--text-main);
+        font-size: 2.1rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-weight: 900;
+      }
+      .slide h2::before {
+        content: "";
+        display: block;
+        width: 6px;
+        height: 34px;
+        background: linear-gradient(
+          to bottom,
+          var(--accent-cyan),
+          var(--accent-purple)
+        );
+        border-radius: 3px;
+        box-shadow: var(--shadow-neon);
+      }
+      .slide h3 {
+        color: var(--accent-cyan);
+        font-size: 1.4rem;
+        margin: 2rem 0 1rem 0;
+        font-weight: 800;
+        display: inline-block;
+        border-bottom: 1px dashed var(--border-highlight);
+        padding-bottom: 4px;
+      }
+      p {
+        margin-bottom: 1.2rem;
+        color: var(--text-muted);
+        font-size: 1.1rem;
+      }
+
+      ul {
+        list-style: none;
+        padding-right: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+      ul li {
+        position: relative;
+        margin-bottom: 1rem;
+        padding-right: 1.8rem;
+        color: var(--text-muted);
+        font-size: 1.1rem;
+      }
+      ul li::before {
+        content: "⯈";
+        position: absolute;
+        right: 0;
+        top: 1px;
+        font-size: 1rem;
+        color: var(--accent-cyan);
+      }
+
+      /* KDD Flowchart - Cyber Style */
+      .kdd-flow-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 10px;
+      }
+      .kdd-flow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        gap: 15px;
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: var(--bg-surface-solid);
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+        min-width: 100%;
+      }
+      .kdd-step {
+        padding: 12px 20px;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-highlight);
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1rem;
+        color: var(--text-main);
+        text-align: center;
+        transition: all 0.3s;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .kdd-step:hover {
+        transform: translateY(-2px);
+        border-color: var(--accent-cyan);
+        box-shadow: var(--shadow-neon);
+      }
+      .kdd-arrow {
+        color: var(--accent-purple);
+        font-size: 1.6rem;
+        font-weight: bold;
+        flex-shrink: 0;
+        margin-top: -2px;
+      }
+      .highlight-step {
+        background: var(--accent-cyan-glow);
+        border-color: var(--accent-cyan);
+        box-shadow: var(--shadow-neon);
+        color: #fff;
+      }
+
+      /* Callouts */
+      .callout {
+        padding: 1.5rem 1.8rem;
+        border-radius: 12px;
+        margin: 2rem 0;
+        position: relative;
+        border-right: 4px solid;
+        background-color: var(--bg-surface);
+        backdrop-filter: var(--glass-blur);
+        width: 100%;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+      }
+      .callout p:last-child {
+        margin-bottom: 0;
+      }
+      .callout-info {
+        border-right-color: var(--info-border);
+      }
+      .callout-warning {
+        border-right-color: var(--warning-border);
+      }
+      .callout-danger {
+        border-right-color: var(--danger-border);
+      }
+
+      /* Hover Spotlight Grid Cards (Optimized Performance) */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-top: 1.5rem;
+      }
+      .data-card {
+        background: var(--bg-surface-solid);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.8rem;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+          border-color 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+      }
+      .data-card:hover {
+        border-color: var(--accent-cyan);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 240, 255, 0.15);
+      }
+
+      .spotlight {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+          400px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+          rgba(0, 240, 255, 0.1),
+          transparent 40%
+        );
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .data-card:hover .spotlight {
+        opacity: 1;
+      }
+      .data-card-content {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+      }
+
+      /* =========================================
+           Syllabus Custom Layout (Tech-Cards) - MODIFIED
+           ========================================= */
+      .part-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin: 2rem 0 1.5rem;
+      }
+      .part-title::before {
+        content: "";
+        flex-grow: 1;
+        height: 1px;
+        background: linear-gradient(
+          to right,
+          var(--border-highlight),
+          transparent
+        );
+      }
+      .part-title::after {
+        content: "";
+        flex-grow: 1;
+        height: 1px;
+        background: linear-gradient(
+          to left,
+          var(--border-highlight),
+          transparent
+        );
+      }
+      .part-title span {
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--text-main);
+        padding: 8px 20px;
+        background: var(--bg-surface-solid);
+        border: 1px solid var(--border-highlight);
+        border-radius: 12px;
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+      }
+
+      .syllabus-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .chapter-card {
+        background: var(--bg-surface-solid);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 1;
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+      }
+      .chapter-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 4px;
+        height: 100%;
+        transition: all 0.3s;
+      }
+      .chapter-card.cyan-edge::before {
+        background: var(--accent-cyan);
+        box-shadow: 0 0 10px var(--accent-cyan);
+      }
+      .chapter-card.purple-edge::before {
+        background: var(--accent-purple);
+        box-shadow: 0 0 10px var(--accent-purple);
+      }
+
+      /* FIXED CHAPTER NUMBER CSS - Small & Bottom Left */
+      .chapter-num {
+        font-size: 1rem;
+        font-weight: 800;
+        opacity: 0.35;
+        position: absolute;
+        left: 12px;
+        bottom: 8px;
+        font-family: "Courier New", Courier, monospace;
+        transition: all 0.3s ease;
+        z-index: 0;
+        pointer-events: none;
+        color: var(--text-muted);
+      }
+      .chapter-card:hover .chapter-num {
+        opacity: 0.8;
+        transform: scale(1.1);
+        color: var(--accent-cyan);
+      }
+      .chapter-card.purple-edge:hover .chapter-num {
+        color: var(--accent-purple);
+      }
+
+      .chapter-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--border-highlight);
+      }
+      .chapter-card.cyan-edge:hover {
+        box-shadow: 0 8px 20px rgba(0, 240, 255, 0.1);
+      }
+      .chapter-card.purple-edge:hover {
+        box-shadow: 0 8px 20px rgba(176, 38, 255, 0.1);
+      }
+
+      .chapter-info {
+        position: relative;
+        z-index: 2;
+      }
+      .chapter-info h4 {
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin: 0;
+        direction: ltr;
+        text-align: left;
+        word-wrap: break-word;
+        line-height: 1.3;
+      }
+      .chapter-card.cyan-edge h4 {
+        color: var(--accent-cyan);
+      }
+      .chapter-card.purple-edge h4 {
+        color: var(--accent-purple);
+      }
+
+      /* Tags */
+      .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 1.5rem;
+      }
+      .tag {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-highlight);
+        color: var(--text-main);
+        padding: 0.6rem 1.4rem;
+        border-radius: 8px; /* Tech square shape */
+        font-size: 0.95rem;
+        font-weight: 700;
+        transition: all 0.2s;
+        white-space: nowrap;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+      }
+      .tag:hover {
+        border-color: var(--accent-cyan);
+        background: var(--accent-cyan-glow);
+        transform: translateY(-2px);
+        color: #fff;
+      }
+
+      /* Links & Buttons */
+      a {
+        color: var(--accent-cyan);
+        text-decoration: none;
+        font-weight: 700;
+        transition: all 0.2s;
+      }
+      a:hover {
+        color: var(--accent-purple);
+        text-shadow: var(--shadow-neon);
+      }
+
+      .copy-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+        padding: 16px 0;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .copy-row:last-child {
+        border-bottom: none;
+      }
+
+      .copy-btn {
+        background: var(--bg-surface-solid);
+        border: 1px solid var(--border-highlight);
+        color: var(--text-main);
+        padding: 8px 18px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        font-family: inherit;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      .copy-btn:hover {
+        background: var(--accent-cyan);
+        color: var(--bg-base);
+        border-color: var(--accent-cyan);
+        box-shadow: var(--shadow-neon);
+        transform: translateY(-2px);
+      }
+      .copy-btn:active {
+        transform: scale(0.95);
+      }
+
+      /* Toast */
+      #toast {
+        position: fixed;
+        bottom: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(
+          135deg,
+          var(--accent-cyan),
+          var(--accent-purple)
+        );
+        color: #fff;
+        padding: 14px 28px;
+        border-radius: 12px;
+        font-weight: 900;
+        font-size: 1.1rem;
+        transition: bottom 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 10000;
+        box-shadow: 0 10px 30px rgba(176, 38, 255, 0.4);
+        white-space: nowrap;
+        pointer-events: none;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      #toast.show {
+        bottom: 40px;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 5rem;
+        padding: 4rem 0;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-muted);
+        font-size: 1.1rem;
+      }
+
+      /* Responsive */
+      @media (max-width: 1200px) {
+        .page-wrapper {
+          width: 92%;
+        }
+      }
+      @media (max-width: 950px) {
+        .page-wrapper {
+          width: 92%;
+          margin: 0 auto;
+          padding-top: 5rem;
+        }
+        .quick-nav {
+          display: none;
+        }
+        .vignette {
+          background: radial-gradient(
+            ellipse at center,
+            transparent 5%,
+            var(--bg-base) 90%
+          );
+          opacity: 0.95;
+        }
+        #three-canvas {
+          opacity: 0.5;
+          filter: contrast(1) brightness(1);
+        }
+        #fallback-canvas {
+          opacity: 0.5;
+        }
+      }
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 2.2rem;
+        }
+        .slide {
+          padding: 2rem 1.5rem;
+          margin-bottom: 2rem;
+          border-radius: 16px;
+        }
+        .grid-2,
+        .syllabus-grid {
+          grid-template-columns: 1fr;
+        }
+        .copy-row {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .copy-row > button {
+          align-self: stretch;
+          text-align: center;
+          justify-content: center;
+          margin-top: 8px;
+        }
+
+        .kdd-flow {
+          padding: 1rem;
+          gap: 10px;
+        }
+        .kdd-step {
+          padding: 8px 12px;
+          font-size: 0.9rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Data Mining Themed 3D/2D Visualizer -->
+    <div class="three-viewport" aria-hidden="true">
+      <canvas id="three-canvas"></canvas>
+    </div>
+    <div class="fallback-viewport" aria-hidden="true">
+      <canvas id="fallback-canvas"></canvas>
+    </div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="tech-grid"></div>
+
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div id="progress-container"><div id="progress-bar"></div></div>
+
+    <div class="theme-toggle-wrapper">
+      <button class="theme-toggle-btn" id="theme-toggle" aria-label="تغییر تم">
+        🌙
+      </button>
+    </div>
+
+    <!-- Quick Nav HUD -->
+    <nav class="quick-nav">
+      <div
+        class="nav-dot"
+        data-target="header"
+        data-tooltip="شروع (کره داده)"
+      ></div>
+      <div
+        class="nav-dot"
+        data-target="intro"
+        data-tooltip="مقدمه (شبکه متصل)"
+      ></div>
+      <div
+        class="nav-dot"
+        data-target="team"
+        data-tooltip="تیم و تسک‌ها (مدارها)"
+      ></div>
+      <div
+        class="nav-dot"
+        data-target="concept"
+        data-tooltip="مفهوم داده‌کاوی (پایپ‌لاین)"
+      ></div>
+      <div
+        class="nav-dot"
+        data-target="syllabus"
+        data-tooltip="سرفصل‌ها (خوشه‌بندی)"
+      ></div>
+      <div
+        class="nav-dot"
+        data-target="rules"
+        data-tooltip="قوانین (ماتریس)"
+      ></div>
+      <div
+        class="nav-dot"
+        data-target="ai"
+        data-tooltip="هوش مصنوعی (یادگیری عمیق)"
+      ></div>
+      <div
+        class="nav-dot"
+        data-target="links"
+        data-tooltip="ارتباطات (صورت فلکی)"
+      ></div>
+    </nav>
+
+    <button id="back-to-top" aria-label="بازگشت به بالا">↑</button>
+    <div id="toast">✅ با موفقیت کپی شد!</div>
+
+    <!-- Content Panels -->
+    <div class="page-wrapper">
+      <header id="header" class="slide" data-index="0">
+        <h1>مقدمه‌ای بر درس داده‌کاوی</h1>
+        <div class="subtitle">جلسه صفر - پاییز ۱۴۰۵</div>
+        <div class="meta-info">
+          <strong>استاد درس:</strong> دکتر اسکندری <br /><br />
+          <strong>ارائه دهندگان:</strong> امیرحسین همتی،حمید نامجو،علی نیکوان و
+          امیرمحمد اسدجو
+        </div>
+      </header>
+
+      <section class="slide" id="intro" data-index="1">
+        <h2>به درس داده‌کاوی خوش آمدید</h2>
+        <div class="callout callout-info">
+          <p>
+            <strong>🎯 اهمیت این جلسه:</strong> هدف از این جلسه پاسخ به سوالات
+            اساسی شماست تا ترمی بدون ابهام داشته باشید.
+          </p>
+        </div>
+        <h3>آنچه امروز پوشش می‌دهیم:</h3>
+        <div class="grid-2">
+          <div class="data-card">
+            <div class="spotlight"></div>
+            <div class="data-card-content">
+              <ul>
+                <li>معرفی تیم TA و نقش ما</li>
+                <li>اهمیت درس داده‌کاوی در دنیای مدرن</li>
+                <li>مرور کلی محتوای دوره و فصول</li>
+                <li>قوانین مهم کلاس و ددلاین‌ها</li>
+              </ul>
+            </div>
+          </div>
+          <div class="data-card">
+            <div class="spotlight"></div>
+            <div class="data-card-content">
+              <ul>
+                <li>نحوه استفاده هوشمندانه از ابزارهای AI</li>
+                <li>آشنایی با پلتفرم Quera و ارسال تکالیف</li>
+                <li>معرفی منابع تکمیلی در وبسایت درس</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="team" data-index="2">
+        <h2>تیم دستیاران آموزشی (TA) و تسک‌ها</h2>
+        <p>
+          <strong>سرپرست‌های دستیار آموزشی:</strong> علی نیکوان و امیرمحمد اسدجو
+        </p>
+        <p>
+          <strong>دستیاران آموزشی:</strong> محمد خلیفه، سپیده نوروزی مطلق، رضا
+          لیاقت، یاس فیضی، علیرضا مقدس
+        </p>
+
+        <h3>چطور به شما کمک می‌کنیم؟</h3>
+        <ul>
+          <li>
+            ارائه منابع تکمیلی (کتاب‌ها، ویدیوها، وبسایت‌ها و دوره‌های آموزشی)
+          </li>
+          <li>پاسخ به سوالات شما در گروه تلگرام (نه پی‌وی) و کوئرا</li>
+          <li>ارائه پاسخنامه کامل برای پک تمرینات و کوییزها</li>
+        </ul>
+
+        <h3>تسک‌های شما در طول ترم:</h3>
+        <div class="tags-container">
+          <span class="tag">📝 حداقل ۵ پک تمرینات هفتگی</span>
+          <span class="tag">⏱️ حداقل ۵ یا ۶ کوییز</span>
+          <span class="tag">🚀 ۱ پروژه کامل (۳ فاز + دفاع)</span>
+        </div>
+      </section>
+
+      <section class="slide" id="concept" data-index="3">
+        <h2>داده‌کاوی: چشم بینای مهندسی کامپیوتر</h2>
+        <h3>داده‌کاوی چیست؟</h3>
+        <p>
+          داده‌کاوی فرآیند کشف الگوهای پنهان، معنادار و کاربردی از میان حجم
+          عظیمی از داده‌هاست. این فرآیند حلقه اصلی از یک زنجیره بزرگتر به نام
+          <strong style="color: var(--accent-cyan)"
+            >KDD (کشف دانش از پایگاه داده)</strong
+          >
+          است.
+        </p>
+
+        <!-- Fixed KDD Flowchart: Use proper left arrow symbol "←" -->
+        <div class="kdd-flow-wrapper" dir="rtl">
+          <div class="kdd-flow">
+            <div class="kdd-step">داده‌های خام</div>
+            <div class="kdd-arrow">←</div>
+            <div class="kdd-step">پیش‌پردازش و پاکسازی</div>
+            <div class="kdd-arrow">←</div>
+            <div class="kdd-step">داده‌کاوی (الگوریتم‌ها)</div>
+            <div class="kdd-arrow">←</div>
+            <div class="kdd-step highlight-step">کشف دانش و الگو</div>
+          </div>
+        </div>
+
+        <h3>چرا داده‌کاوی؟</h3>
+        <div class="grid-2">
+          <div class="data-card">
+            <div class="spotlight"></div>
+            <div class="data-card-content">
+              <strong>🛒 تجارت الکترونیک</strong><br />سیستم‌های پیشنهاددهنده
+              آمازون یا دیجی‌کالا
+            </div>
+          </div>
+          <div class="data-card">
+            <div class="spotlight"></div>
+            <div class="data-card-content">
+              <strong>💳 بانکداری و مالی</strong><br />تشخیص آنی تقلب در
+              تراکنش‌های کارت‌های اعتباری
+            </div>
+          </div>
+          <div class="data-card">
+            <div class="spotlight"></div>
+            <div class="data-card-content">
+              <strong>🏥 پزشکی و سلامت</strong><br />پیش‌بینی شیوع بیماری‌ها و
+              کشف دارو
+            </div>
+          </div>
+          <div class="data-card">
+            <div class="spotlight"></div>
+            <div class="data-card-content">
+              <strong>📱 شبکه‌های اجتماعی</strong><br />تحلیل ریزش مشتریان
+              (Churn) و احساسات
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <p>
+            <strong>تفاوت با یادگیری ماشین:</strong> هدف یادگیری ماشین ساخت مدل
+            برای پیش‌بینی آینده است، اما تمرکز داده‌کاوی بر کشف الگوهای ناشناخته
+            در داده‌های فعلی است.
+          </p>
+          <p style="opacity: 0.8; font-size: 0.95rem; margin-top: 10px">
+            <em
+              >مثال: داده‌کاوی مثل فرآیند استخراج نفت است. الگوریتم‌های ML مثل
+              تجهیزات پیشرفته در این فرآیند هستند.</em
+            >
+          </p>
+        </div>
+        <p>
+          <strong>پیش‌نیاز درس:</strong> ساختمان داده‌ها و الگوریتم‌ها، آمار و
+          احتمال مهندسی، پایگاه داده
+        </p>
+      </section>
+
+      <!-- CREATIVE & EXPANDED SYLLABUS GRID -->
+      <section class="slide" id="syllabus" data-index="4">
+        <h2>مرور فصل‌های جزوه</h2>
+        <p style="margin-bottom: 2rem">
+          در این کلاس، سرفصل‌ها را در قالب دو بخش تخصصی بررسی و پیاده‌سازی
+          خواهیم کرد:
+        </p>
+
+        <div class="part-title">
+          <span style="color: var(--accent-cyan)"
+            >بخش اول: مفاهیم بنیادین و مدل‌های پایه</span
+          >
+        </div>
+        <div class="syllabus-grid">
+          <div class="chapter-card cyan-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">01</div>
+            <div class="chapter-info">
+              <h4 class="en">Introduction</h4>
+            </div>
+          </div>
+          <div class="chapter-card cyan-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">02</div>
+            <div class="chapter-info">
+              <h4 class="en">Data, measurements, and data preprocessing</h4>
+            </div>
+          </div>
+          <div class="chapter-card cyan-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">03</div>
+            <div class="chapter-info">
+              <h4 class="en">
+                Data warehousing and online analytical processing
+              </h4>
+            </div>
+          </div>
+          <div class="chapter-card cyan-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">04</div>
+            <div class="chapter-info">
+              <h4 class="en">Pattern mining: basic concepts and methods</h4>
+            </div>
+          </div>
+          <div class="chapter-card cyan-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">05</div>
+            <div class="chapter-info">
+              <h4 class="en">Pattern mining: advanced methods</h4>
+            </div>
+          </div>
+          <div class="chapter-card cyan-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">06</div>
+            <div class="chapter-info">
+              <h4 class="en">Classification: basic concepts and methods</h4>
+            </div>
+          </div>
+        </div>
+
+        <div class="part-title">
+          <span style="color: var(--accent-purple)"
+            >بخش دوم: روش‌های تحلیلی پیشرفته و رویکردهای نوین پژوهشی</span
+          >
+        </div>
+        <div class="syllabus-grid">
+          <div class="chapter-card purple-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">07</div>
+            <div class="chapter-info">
+              <h4 class="en">Classification: advanced methods</h4>
+            </div>
+          </div>
+          <div class="chapter-card purple-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">08</div>
+            <div class="chapter-info">
+              <h4 class="en">Cluster analysis: basic concepts and methods</h4>
+            </div>
+          </div>
+          <div class="chapter-card purple-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">09</div>
+            <div class="chapter-info">
+              <h4 class="en">Cluster analysis: advanced methods</h4>
+            </div>
+          </div>
+          <div class="chapter-card purple-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">10</div>
+            <div class="chapter-info">
+              <h4 class="en">Deep learning</h4>
+            </div>
+          </div>
+          <div class="chapter-card purple-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">11</div>
+            <div class="chapter-info">
+              <h4 class="en">Outlier detection</h4>
+            </div>
+          </div>
+          <div class="chapter-card purple-edge">
+            <div class="spotlight"></div>
+            <div class="chapter-num">12</div>
+            <div class="chapter-info">
+              <h4 class="en">Data mining trends and research frontiers</h4>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="rules" data-index="5">
+        <h2>قوانین مهم کلاس و زمان‌بندی‌ها</h2>
+        <div class="grid-2">
+          <div class="data-card">
+            <div class="spotlight"></div>
+            <div class="data-card-content">
+              <h3 style="margin-top: 0">قوانین کلاس:</h3>
+              <ul style="margin-bottom: 0">
+                <li>حضور منظم در کلاس الزامی است.</li>
+                <li>تحویل به موقع تکالیف و پروژه.</li>
+                <li>عدم تقلب در امتحانات و عدم استفاده از بات.</li>
+                <li>سوالات فقط در گروه تلگرام یا کوئرا مطرح شود.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="data-card">
+            <div class="spotlight"></div>
+            <div class="data-card-content">
+              <h3 style="margin-top: 0">زمان‌های مهم:</h3>
+              <ul style="margin-bottom: 0">
+                <li><strong>کلاس استاد:</strong> دوشنبه‌ها ساعت ۱۰:۱۵</li>
+                <li><strong>انتشار تکالیف:</strong> ۸ صبح روز بعد از کلاس</li>
+                <li><strong>ددلاین بدون جریمه:</strong> یکشنبه شب ۲۳:۵۹:۵۹</li>
+                <li>
+                  <strong>انتشار پاسخنامه:</strong> بعد از ددلاین جریمه‌دار
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-danger">
+          <p>
+            <strong>⚠️ ددلاین با جریمه ارسال تکالیف:</strong> دوشنبه شب ساعت
+            ۲۳:۵۹:۵۹.
+          </p>
+          <p>
+            حتی در صورتی که تمام سوالات را کاملاً درست حل کرده باشید؛ فقط
+            <strong>۷۰ درصد نمره</strong> آن تکلیف را می‌گیرید!
+          </p>
+        </div>
+      </section>
+
+      <section class="slide" id="ai" data-index="6">
+        <h2>بستر تکالیف و نقش هوش مصنوعی</h2>
+
+        <h3>پلتفرم Quera</h3>
+        <p>
+          بستر اصلی تکالیف و تمرین‌های درس. امکانات شامل: ارسال آنلاین کد، تست
+          خودکار، مشاهده نمرات و مدیریت ددلاین‌ها.
+        </p>
+        <div
+          class="callout callout-warning"
+          style="padding: 1rem 1.5rem; margin: 1rem 0"
+        >
+          <p>
+            <strong>نکته مهم:</strong> نام کاربری Quera حتماً باید مطابق
+            <strong>شماره دانشجویی</strong> شما باشد.
+          </p>
+        </div>
+
+        <h3>هوش مصنوعی: ابزاری برای یادگیری</h3>
+        <p>AI دستیار قدرتمند شماست، اما جایگزینی برای تفکر و حل مسئله نیست.</p>
+        <ul>
+          <li>
+            <strong>راهنمایی سقراطی:</strong> به جای درخواست پاسخ، سوالات
+            کاوشگرانه بپرسید.
+          </li>
+          <li>
+            <strong>تسلط بر اشکال‌زدایی:</strong> کمک در تحلیل خطای کد، نه
+            دریافت کد آماده.
+          </li>
+          <li>
+            <strong>تایید درک:</strong> از AI بخواهید از شما امتحان بگیرد.
+          </li>
+        </ul>
+
+        <div
+          class="tags-container"
+          style="justify-content: center; margin: 2rem 0"
+        >
+          <span class="tag">🤖 ChatGPT</span> <span class="tag">🤖 Gemini</span>
+          <span class="tag">🤖 Claude</span>
+          <span class="tag">🤖 DeepSeek</span>
+          <span class="tag">🤖 Mistral</span>
+        </div>
+
+        <div
+          class="callout callout-danger"
+          style="padding: 1rem 1.5rem; margin: 1rem 0"
+        >
+          <p>
+            استفاده از ابزارهای هوش مصنوعی برای یادگیری توصیه می‌شود؛ اما
+            <strong
+              >استفاده مستقیم از پاسخ‌ها بدون درک فرآیند حل مسئله به یادگیری
+              آسیب می‌زند.</strong
+            >
+          </p>
+        </div>
+      </section>
+
+      <section class="slide" id="links" data-index="7">
+        <h2 style="justify-content: center">منابع و ارتباطات</h2>
+        <p style="text-align: center">
+          وبسایت درس حاوی منابع ارزشمند، اخبار کلاس و پک سوالات و جواب‌ها است.
+        </p>
+
+        <div class="data-card" style="margin: 2.5rem auto; max-width: 100%">
+          <div class="spotlight"></div>
+          <div class="data-card-content">
+            <div class="copy-row">
+              <span style="word-break: break-all"
+                ><strong>🌐 وبسایت:</strong>
+                <a
+                  href="https://iau-shiraz-courses.github.io/DM-fall2026"
+                  target="_blank"
+                  dir="ltr"
+                  >iau-shiraz-courses.github.io/DM-fall2026</a
+                ></span
+              >
+              <button
+                class="copy-btn"
+                onclick="
+                  copyToClipboard(
+                    'https://iau-shiraz-courses.github.io/DM-fall2026',
+                  )
+                "
+              >
+                📋 کپی لینک
+              </button>
+            </div>
+            <div class="copy-row">
+              <span style="word-break: break-all"
+                ><strong>👥 گروه تلگرام:</strong>
+                <a
+                  href="https://t.me/dm_fall2026_Group"
+                  target="_blank"
+                  dir="ltr"
+                  >t.me/dm_fall2026_Group</a
+                ></span
+              >
+              <button
+                class="copy-btn"
+                onclick="copyToClipboard('https://t.me/dm_fall2026_Group')"
+              >
+                📋 کپی لینک
+              </button>
+            </div>
+            <div class="copy-row">
+              <span style="word-break: break-all"
+                ><strong>📢 کانال تلگرام:</strong>
+                <a href="https://t.me/DM_fall2026" target="_blank" dir="ltr"
+                  >t.me/DM_fall2026</a
+                ></span
+              >
+              <button
+                class="copy-btn"
+                onclick="copyToClipboard('https://t.me/DM_fall2026')"
+              >
+                📋 کپی لینک
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <p>
+            برای عضویت در گروه تلگرامی؛
+            <strong>نام و نام خانوادگی و شماره دانشجویی</strong> را به آیدی زیر
+            در تلگرام بفرستید:
+          </p>
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 15px;
+              margin-top: 15px;
+              flex-wrap: wrap;
+            "
+          >
+            <a
+              href="https://t.me/xAlleenx"
+              target="_blank"
+              dir="ltr"
+              style="font-size: 1.4rem; font-weight: 900; letter-spacing: 1px"
+              >@xAlleenx</a
+            >
+            <button class="copy-btn" onclick="copyToClipboard('@xAlleenx')">
+              📋 کپی آیدی
+            </button>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 4rem">
+          <h3
+            style="
+              font-size: 2.4rem;
+              background: linear-gradient(
+                to left,
+                var(--accent-cyan),
+                var(--accent-purple)
+              );
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              display: inline-block;
+              margin-bottom: 0.5rem;
+              border: none;
+              padding: 0;
+            "
+          >
+            پرسش و پاسخ (Q&A)
+          </h3>
+          <p
+            style="color: var(--text-main); font-size: 1.2rem; margin-bottom: 0"
+          >
+            وقت سوالات شماست! هر سوالی دارید، بپرسید.
+          </p>
+        </div>
+      </section>
+
+      <footer>
+        <p>با آرزوی موفقیت در ترم پیش رو | از حضور و توجه شما سپاسگزاریم</p>
+        <p
+          style="
+            margin-top: 5px;
+            color: var(--accent-cyan);
+            font-weight: bold;
+            letter-spacing: 1px;
+          "
+        >
+          به امید ترمی پربار در درس داده‌کاوی
+        </p>
+      </footer>
+    </div>
+
+    <!-- High Performance JS (Zero Lag / Cyber Animations) -->
+    <script>
+      // 1. Theme Toggle Logic
+      const themeToggleBtn = document.getElementById("theme-toggle");
+      const htmlElement = document.documentElement;
+      const updateIcon = () => {
+        themeToggleBtn.innerHTML =
+          htmlElement.getAttribute("data-theme") === "dark" ? "☀️" : "🌙";
+      };
+      updateIcon();
+      themeToggleBtn.addEventListener("click", () => {
+        htmlElement.setAttribute(
+          "data-theme",
+          htmlElement.getAttribute("data-theme") === "dark" ? "light" : "dark",
+        );
+        updateIcon();
+      });
+
+      // 2. State & Scroll (Optimized)
+      const progressBar = document.getElementById("progress-bar");
+      const backToTopBtn = document.getElementById("back-to-top");
+      const allSections = document.querySelectorAll("header, .slide");
+      const navDots = document.querySelectorAll(".nav-dot");
+      let graphicIndex = 0;
+      let ticking = false;
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              const winScroll =
+                window.scrollY || document.documentElement.scrollTop;
+              const height =
+                document.documentElement.scrollHeight -
+                document.documentElement.clientHeight;
+              progressBar.style.width = (winScroll / height) * 100 + "%";
+              backToTopBtn.classList.toggle("visible", winScroll > 400);
+
+              // Determine active section for graph morphing
+              let minDistance = Infinity;
+              let currentIdx = graphicIndex;
+              const centerScreen = window.innerHeight / 2;
+
+              allSections.forEach((sec) => {
+                const rect = sec.getBoundingClientRect();
+                const dist = Math.abs(
+                  rect.top + rect.height / 2 - centerScreen,
+                );
+                if (dist < minDistance) {
+                  minDistance = dist;
+                  currentIdx = parseInt(sec.getAttribute("data-index"));
+                }
+              });
+
+              if (currentIdx !== graphicIndex) {
+                graphicIndex = currentIdx;
+                if (window.threeState) window.threeState.index = graphicIndex;
+                navDots.forEach((dot, i) =>
+                  dot.classList.toggle("active", i === graphicIndex),
+                );
+              }
+              ticking = false;
+            });
+            ticking = true;
+          }
+        },
+        { passive: true },
+      );
+
+      backToTopBtn.addEventListener("click", () =>
+        window.scrollTo({ top: 0, behavior: "smooth" }),
+      );
+
+      // 3. Robust Copy
+      function copyToClipboard(text) {
+        const tempInput = document.createElement("input");
+        tempInput.style.position = "absolute";
+        tempInput.style.left = "-1000px";
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        tempInput.setSelectionRange(0, 99999);
+        try {
+          document.execCommand("copy");
+          const toast = document.getElementById("toast");
+          toast.classList.add("show");
+          setTimeout(() => toast.classList.remove("show"), 2500);
+        } catch (err) {
+          alert("کپی دستی: " + text);
+        }
+        document.body.removeChild(tempInput);
+      }
+
+      // 4. Scroll Reveal
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.classList.add("reveal");
+          });
+        },
+        { threshold: 0.15 },
+      );
+      allSections.forEach((slide) => observer.observe(slide));
+
+      navDots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(
+            dot.getAttribute("data-target"),
+          );
+          if (target)
+            window.scrollTo({
+              top: target.getBoundingClientRect().top + window.pageYOffset - 20,
+              behavior: "smooth",
+            });
+        });
+      });
+
+      // 5. High Performance Spotlight Hover
+      // Uses event delegation or requestAnimationFrame per card
+      document.querySelectorAll(".data-card, .chapter-card").forEach((card) => {
+        let cardRect = null;
+        card.addEventListener(
+          "mouseenter",
+          () => (cardRect = card.getBoundingClientRect()),
+        );
+        card.addEventListener("mousemove", (e) => {
+          if (!cardRect) return;
+          window.requestAnimationFrame(() => {
+            card.style.setProperty(
+              "--mouse-x",
+              `${e.clientX - cardRect.left}px`,
+            );
+            card.style.setProperty(
+              "--mouse-y",
+              `${e.clientY - cardRect.top}px`,
+            );
+          });
+        });
+        // Handle scroll invalidating the rect
+        window.addEventListener("scroll", () => (cardRect = null), {
+          passive: true,
+        });
+      });
+
+      // ------------------------------------------------------------------
+      // 6. CREATIVE DATA MINING 3D VISUALIZATIONS (Zero Lag Arrays)
+      // ------------------------------------------------------------------
+      const palette = [
+        { a: 0x00ffff, b: 0xdf73ff }, // Main Cyan & Purple
+        { a: 0x0284c7, b: 0x7c3aed }, // Light Theme Blue & Violet
+      ];
+
+      function loadThree() {
+        if (window.THREE) {
+          initThree();
+          return;
+        }
+        const script = document.createElement("script");
+        script.src =
+          "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js";
+        script.async = true;
+        script.onload = initThree;
+        document.head.appendChild(script);
+      }
+
+      function initThree() {
+        if (!window.THREE || window.threeState) return;
+        try {
+          const THREE = window.THREE;
+          const canvas = document.getElementById("three-canvas");
+          const renderer = new THREE.WebGLRenderer({
+            canvas,
+            alpha: true,
+            antialias: true,
+            powerPreference: "high-performance",
+          });
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+
+          const scene = new THREE.Scene();
+          const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+          camera.position.set(0, 0, 16);
+
+          const root = new THREE.Group();
+          scene.add(root);
+          const network = new THREE.Group();
+          root.add(network);
+
+          // Highly optimized Float32Arrays instead of Vector3 objects
+          const N = 45;
+          const posArray = new Float32Array(N * 3);
+          const targetArray = new Float32Array(N * 3);
+
+          for (let i = 0; i < N * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 5;
+          }
+
+          const pointGeo = new THREE.BufferGeometry();
+          pointGeo.setAttribute(
+            "position",
+            new THREE.BufferAttribute(posArray, 3),
+          );
+          const pointMat = new THREE.PointsMaterial({
+            color: 0x00ffff,
+            size: 0.12,
+            transparent: true,
+            opacity: 0.9,
+            blending: THREE.AdditiveBlending,
+          });
+          const points = new THREE.Points(pointGeo, pointMat);
+          network.add(points);
+
+          const edgesList = [];
+          for (let i = 0; i < N; i++) {
+            // Connect each node to 3 others to form a web
+            edgesList.push(i, (i + 1) % N, i, (i + 4) % N, i, (i + 9) % N);
+          }
+          const edgePos = new Float32Array(edgesList.length * 3);
+          const edgeGeo = new THREE.BufferGeometry();
+          edgeGeo.setAttribute(
+            "position",
+            new THREE.BufferAttribute(edgePos, 3),
+          );
+          const edgeMat = new THREE.LineBasicMaterial({
+            color: 0xdf73ff,
+            transparent: true,
+            opacity: 0.25,
+            blending: THREE.AdditiveBlending,
+          });
+          const edges = new THREE.LineSegments(edgeGeo, edgeMat);
+          network.add(edges);
+
+          const core = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(1.0, 2),
+            new THREE.MeshBasicMaterial({
+              color: 0x00ffff,
+              wireframe: true,
+              transparent: true,
+              opacity: 0.15,
+              blending: THREE.AdditiveBlending,
+            }),
+          );
+          root.add(core);
+
+          const rings = [];
+          [2.2, 3.2, 4.2].forEach((r, i) => {
+            const ring = new THREE.Mesh(
+              new THREE.TorusGeometry(r, 0.01 + i * 0.005, 8, 100),
+              new THREE.MeshBasicMaterial({
+                color: i === 1 ? 0xdf73ff : 0x00ffff,
+                transparent: true,
+                opacity: 0.3 - i * 0.05,
+                blending: THREE.AdditiveBlending,
+              }),
+            );
+            ring.rotation.set(0.5 + i * 0.2, i * 0.8, i * 0.3);
+            root.add(ring);
+            rings.push(ring);
+          });
+
+          const resize = () => {
+            const w = window.innerWidth,
+              h = window.innerHeight;
+            renderer.setSize(w, h, false);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+          };
+          window.addEventListener("resize", resize, { passive: true });
+          resize();
+
+          window.threeState = {
+            renderer,
+            scene,
+            camera,
+            root,
+            network,
+            points,
+            edges,
+            core,
+            rings,
+            index: graphicIndex,
+            posArr: posArray,
+            tgtArr: targetArray,
+            edgesList,
+          };
+          document
+            .querySelector(".three-viewport")
+            .classList.add("three-ready");
+
+          const animate = (time) => {
+            const t = time * 0.0002;
+            const state = window.threeState;
+            const shapeId = state.index;
+
+            // Position root to the left dynamically
+            const targetRootX = window.innerWidth <= 950 ? 0 : -5.5;
+            state.root.position.x +=
+              (targetRootX - state.root.position.x) * 0.05;
+
+            // Smooth Rotations
+            state.root.rotation.y += 0.001;
+            state.root.rotation.x = Math.sin(t * 2.0) * 0.05;
+            state.network.rotation.z = Math.sin(t) * 0.05;
+            state.core.rotation.x += 0.002;
+            state.core.rotation.y += 0.003;
+            state.rings.forEach((ring, i) => {
+              ring.rotation.z += 0.001 * (i + 1);
+              ring.rotation.x += 0.0005 * (i % 2 ? -1 : 1);
+            });
+
+            // --- CREATIVE DATA MINING SHAPES (Zero Object Allocation) ---
+            for (let i = 0; i < N; i++) {
+              let tx = 0,
+                ty = 0,
+                tz = 0;
+              const theta = i * ((Math.PI * 2) / N);
+
+              switch (shapeId) {
+                case 0: // Sphere (Header)
+                  const phi = Math.acos(-1 + (2 * i) / N);
+                  const sqTheta = Math.sqrt(N * Math.PI) * phi;
+                  tx = 2.5 * Math.cos(sqTheta) * Math.sin(phi);
+                  ty = 2.5 * Math.sin(sqTheta) * Math.sin(phi);
+                  tz = 2.5 * Math.cos(phi);
+                  break;
+                case 1: // Connected Web (Intro)
+                  const r = 2.0 + Math.sin(i * 2.1) * 0.5;
+                  tx = Math.cos(theta * 3) * r;
+                  ty = Math.sin(theta * 2) * r;
+                  tz = Math.sin(theta * 4) * r;
+                  break;
+                case 2: // Decentralized Rings (Team)
+                  const r1 = i % 2 === 0 ? 3.5 : 1.5;
+                  tx = r1 * Math.cos(theta * 2);
+                  ty = Math.sin(i * 1.5) * 1.2;
+                  tz = r1 * Math.sin(theta * 2);
+                  break;
+                case 3: // KDD Pipeline (Flow from left to right)
+                  tx = (i / N) * 6 - 3;
+                  ty = Math.sin(t * 5 + i) * 0.8;
+                  tz = Math.cos(t * 3 + i) * 0.8;
+                  break;
+                case 4: // K-Means Clustering (Syllabus)
+                  const cluster = i % 3;
+                  const cx = cluster === 0 ? -2 : cluster === 1 ? 2 : 0;
+                  const cy = cluster === 0 ? -2 : cluster === 1 ? -2 : 2;
+                  tx = cx + Math.cos(i) * 0.8;
+                  ty = cy + Math.sin(i) * 0.8;
+                  tz = Math.sin(i * 2) * 0.8;
+                  break;
+                case 5: // Matrix / Grid (Rules)
+                  const row = Math.floor(i / 8);
+                  const col = i % 8;
+                  tx = col * 0.8 - 2.8;
+                  ty = row * 0.8 - 2.0;
+                  tz = Math.sin(t * 3 + i) * 0.5;
+                  break;
+                case 6: // Deep Neural Network Layers (AI)
+                  const layer = i % 3;
+                  const nodeInLayer = Math.floor(i / 3);
+                  tx = (layer - 1) * 2.5;
+                  ty = (nodeInLayer - 7) * 0.4;
+                  tz = Math.sin(i) * 0.2;
+                  break;
+                case 7: // Constellation (Links)
+                  tx = Math.cos(theta * 5) * 3;
+                  ty = Math.sin(theta * 3) * 3;
+                  tz = Math.cos(theta * 7) * 3;
+                  break;
+              }
+              state.tgtArr[i * 3] = tx;
+              state.tgtArr[i * 3 + 1] = ty;
+              state.tgtArr[i * 3 + 2] = tz;
+            }
+
+            // Interpolate Positions
+            for (let i = 0; i < N * 3; i++) {
+              state.posArr[i] += (state.tgtArr[i] - state.posArr[i]) * 0.05;
+            }
+
+            // Update Edges via list
+            for (let i = 0; i < state.edgesList.length; i++) {
+              const nodeIdx = state.edgesList[i];
+              edgePos[i * 3] = state.posArr[nodeIdx * 3];
+              edgePos[i * 3 + 1] = state.posArr[nodeIdx * 3 + 1];
+              edgePos[i * 3 + 2] = state.posArr[nodeIdx * 3 + 2];
+            }
+
+            state.points.geometry.attributes.position.needsUpdate = true;
+            state.edges.geometry.attributes.position.needsUpdate = true;
+
+            // Core/Rings visibility logic
+            const showCore =
+              shapeId === 0 || shapeId === 2 || shapeId === 7 ? 1.0 : 0.001;
+            state.core.scale.lerp(
+              new THREE.Vector3(showCore, showCore, showCore),
+              0.05,
+            );
+            state.rings.forEach((r) =>
+              r.scale.lerp(
+                new THREE.Vector3(showCore, showCore, showCore),
+                0.05,
+              ),
+            );
+
+            state.renderer.render(state.scene, state.camera);
+            requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+        } catch (_) {}
+      }
+
+      // High Performance 2D Fallback
+      function initFallback() {
+        const canvas = document.getElementById("fallback-canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const N = 40;
+        const nodes = new Float32Array(N * 4); // x, y, tx, ty
+        for (let i = 0; i < N; i++) {
+          nodes[i * 4] = 0;
+          nodes[i * 4 + 1] = 0;
+        }
+
+        const resize = () => {
+          const dpr = Math.min(devicePixelRatio || 1, 2),
+            w = innerWidth,
+            h = innerHeight;
+          canvas.width = w * dpr;
+          canvas.height = h * dpr;
+          canvas.style.width = w + "px";
+          canvas.style.height = h + "px";
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        };
+        window.addEventListener("resize", resize, { passive: true });
+        resize();
+
+        const draw = (ms) => {
+          const w = innerWidth,
+            h = innerHeight,
+            t = ms * 0.0003,
+            p = palette[0];
+          ctx.clearRect(0, 0, w, h);
+          const cx = w <= 950 ? w / 2 : w * 0.25;
+          const cy = h * 0.5;
+          const scale = Math.min(w, h) * 0.18;
+
+          const shapeId = graphicIndex;
+
+          // Calculate Targets
+          for (let i = 0; i < N; i++) {
+            let tx = 0,
+              ty = 0;
+            const theta = i * ((Math.PI * 2) / N);
+            switch (shapeId) {
+              case 0:
+                tx = cx + Math.cos(theta) * scale * 1.2;
+                ty = cy + Math.sin(theta) * scale * 1.2;
+                break;
+              case 1:
+                tx = cx + Math.cos(theta * 3) * scale;
+                ty = cy + Math.sin(theta * 2) * scale;
+                break;
+              case 2:
+                const r = i % 2 ? scale * 1.5 : scale * 0.8;
+                tx = cx + Math.cos(theta * 2 + t) * r;
+                ty = cy + Math.sin(theta * 2 + t) * r * 0.5;
+                break;
+              case 3:
+                tx = cx + (i / N) * scale * 3 - scale * 1.5;
+                ty = cy + Math.sin(t * 5 + i) * scale * 0.5;
+                break;
+              case 4:
+                const cl = i % 3;
+                const ccx = cl === 0 ? -scale : cl === 1 ? scale : 0;
+                const ccy = cl === 0 ? -scale : cl === 1 ? -scale : scale;
+                tx = cx + ccx + Math.cos(i) * scale * 0.4;
+                ty = cy + ccy + Math.sin(i) * scale * 0.4;
+                break;
+              case 5:
+                tx = cx + (i % 8) * scale * 0.4 - scale * 1.4;
+                ty = cy + Math.floor(i / 8) * scale * 0.4 - scale * 1;
+                break;
+              case 6:
+                tx = cx + ((i % 3) - 1) * scale * 1.2;
+                ty = cy + (Math.floor(i / 3) - 6) * scale * 0.25;
+                break;
+              case 7:
+                tx = cx + Math.cos(theta * 5) * scale * 1.3;
+                ty = cy + Math.sin(theta * 3) * scale * 1.3;
+                break;
+            }
+            nodes[i * 4 + 2] = tx;
+            nodes[i * 4 + 3] = ty;
+          }
+
+          // Move and Draw
+          ctx.fillStyle = `rgba(0, 240, 255, 0.7)`;
+          ctx.strokeStyle = `rgba(176, 38, 255, 0.2)`;
+          ctx.lineWidth = 1;
+
+          ctx.beginPath();
+          for (let i = 0; i < N; i++) {
+            nodes[i * 4] += (nodes[i * 4 + 2] - nodes[i * 4]) * 0.08;
+            nodes[i * 4 + 1] += (nodes[i * 4 + 3] - nodes[i * 4 + 1]) * 0.08;
+
+            ctx.moveTo(nodes[i * 4], nodes[i * 4 + 1]);
+            ctx.arc(nodes[i * 4], nodes[i * 4 + 1], 2, 0, Math.PI * 2);
+
+            // Connect to a few others
+            const j1 = (i + 1) % N,
+              j2 = (i + 4) % N;
+            ctx.moveTo(nodes[i * 4], nodes[i * 4 + 1]);
+            ctx.lineTo(nodes[j1 * 4], nodes[j1 * 4 + 1]);
+            ctx.moveTo(nodes[i * 4], nodes[i * 4 + 1]);
+            ctx.lineTo(nodes[j2 * 4], nodes[j2 * 4 + 1]);
+          }
+          ctx.stroke();
+          ctx.fill();
+
+          requestAnimationFrame(draw);
+        };
+        requestAnimationFrame(draw);
+      }
+
+      initFallback();
+      loadThree();
+      document.fonts.ready.then(() => (document.body.style.opacity = 1));
+    </script>
+  </body>
+</html>

@@ -792,6 +792,7 @@
               Slides, readings, and deadlines, week by week.
             </p>
           </div>
+
           <div
             class="flex flex-wrap gap-2"
             id="filter-group"
@@ -807,7 +808,7 @@
 
         <div class="overflow-x-auto -mx-5 sm:mx-0 px-5 sm:px-0">
           <table
-            class="w-full text-sm border-collapse min-w-[860px]"
+            class="w-full text-sm border-collapse min-w-[980px]"
             id="schedule-table"
           >
             <thead>
@@ -815,6 +816,7 @@
                 class="text-left text-xs uppercase tracking-wide text-muted dark:text-slate-400 border-b border-hairline dark:border-navy-700"
               >
                 <th class="py-3 pr-4 font-medium">Week</th>
+                <th class="py-3 pr-4 font-medium">Date</th>
                 <th class="py-3 pr-4 font-medium">Topic</th>
                 <th class="py-3 pr-4 font-medium">Slides</th>
                 <th class="py-3 pr-4 font-medium">Reading</th>
@@ -822,14 +824,51 @@
                 <th class="py-3 pr-2 font-medium">Status</th>
               </tr>
             </thead>
+
             <tbody class="divide-y divide-hairline dark:divide-navy-700">
-              <!-- Schedule rows will be added during the semester -->
-              <tr>
-                <td
-                  colspan="6"
-                  class="py-8 text-center text-muted dark:text-slate-400 italic"
-                >
-                  Schedule will be updated as the semester progresses.
+              <!-- Session 0 -->
+              <tr data-type="lecture">
+                <td class="py-4 pr-4 whitespace-nowrap">
+                  <span class="font-medium">0</span>
+                </td>
+
+                <td class="py-4 pr-4 whitespace-nowrap">
+                  <div class="font-medium">Sep 21, 2026</div>
+                  <div class="text-xs text-muted dark:text-slate-500 mt-1">
+                    10:00
+                  </div>
+                </td>
+
+                <td class="py-4 pr-4">
+                  <div class="font-medium text-ink dark:text-white">
+                    Course Introduction
+                  </div>
+                  <div class="text-xs text-muted dark:text-slate-500 mt-1">
+                    Introduction to the course and semester structure
+                  </div>
+                </td>
+
+                <td class="py-4 pr-4">
+                  <a
+                    href="./slides/DM%20Fall1405.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-accent hover:underline font-medium"
+                  >
+                    View slides ↗
+                  </a>
+                </td>
+
+                <td class="py-4 pr-4 text-muted dark:text-slate-400">—</td>
+
+                <td class="py-4 pr-4 text-muted dark:text-slate-400">—</td>
+
+                <td class="py-4 pr-2">
+                  <span
+                    class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-accent/10 text-accent"
+                  >
+                    Completed
+                  </span>
                 </td>
               </tr>
             </tbody>

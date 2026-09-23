@@ -42,9 +42,11 @@ The course covers the end-to-end **Knowledge Discovery in Databases (KDD)** pipe
 
 ```text
 DM-fall2026/
-├── index.html        # Main course landing page
-├── styles.css        # Custom styles and Tailwind integrations
-├── script.js        # Interactive UI components & logic
+├── index.html                  # Main course landing page
+├── styles.css                  # Custom styles and Tailwind integrations
+├── script.js                   # Interactive UI components & logic
+├── slides/
+│   └── DM Fall1405.html        # Session 0 presentation
 └── src/
-    └── images/       # Instructor & Teaching Assistants profiles
+    └── images/                 # Instructor & Teaching Assistants profiles
 ```
